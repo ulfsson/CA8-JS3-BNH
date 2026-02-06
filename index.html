@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Eik Ulfsson">
+  <title>Bear Hunter Ninja Game</title>
+</head>
+
+<body>
+  <p id="player-choice"></p>
+  <p id="computer-choice"></p>
+  <p id="win-condition"></p>
+  <script>
+
+    // Get the player's name and greet them.
+    let playerName = prompt("Welcome to Bear Hunter Ninja! Please enter your name to get started.");
+    alert(`Hi ${playerName} Let's Play!!`);
+
+    // Set the player and computer choices, and ensure they're both lower case.
+    let playerChoice = prompt("Who are you: Bear, Ninja, or Hunter?").toLowerCase();
+    let computerChoice = "bear"; // Hard-coded for now.
+
+    // Initialize the winner to be a tie, modified by the if conditional below.
+    let theWinner = "tie";
+
+    // If player and computer choices are NOT equal, we look at the computer's choice compared to
+    // the player's and set the correct winner.
+    if (playerChoice !== computerChoice) {
+      // Default winner to the computer. The player entering anything invalid causes it to win automatically.
+      theWinner = "computer";
+      
+      // Go through the cases of the player's choice and sets the player as the winner based on this.
+      switch (playerChoice.toLowerCase()) {
+        case 'bear':
+          if (computerChoice === 'ninja') {
+            theWinner = "player";
+          }
+          break;
+
+        case 'hunter':
+          if (computerChoice === 'bear') {
+            theWinner = "player";
+          }
+          break;
+
+        case 'ninja':
+          if (computerChoice === 'hunter') {
+            theWinner = "player";
+          }
+          break;
+      }
+    }
+
+    // Capitalize the first letter of the player's and computer's choices for the string template.
+    playerChoice = playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1);
+    computerChoice = computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1);
+
+    // Construct the string templates.
+    let playerChoiceOutput = `${playerName}, You picked ${playerChoice}!`;
+    let computerChoiceOutput = `The computer picked ${computerChoice}!`;
+
+    // Set the text on the HTML page and output to the console.
+    document.getElementById("player-choice").innerHTML = playerChoiceOutput;
+    document.getElementById("computer-choice").innerHTML = computerChoiceOutput;
+    console.log(playerChoiceOutput);
+    console.log(computerChoiceOutput);
+
+    // Check theWinner string and output the appropriate win strings to the HTML and console.
+    if (theWinner === "tie") {
+      document.getElementById("win-condition").innerHTML = "It's a tie!!";
+      console.log("It's a tie!!");
+    } else if (theWinner === "player") {
+      document.getElementById("win-condition").innerHTML = "You Win!!";
+      console.log("You Win!!");
+    } else {
+      document.getElementById("win-condition").innerHTML = "Computer Wins!!";
+      console.log("Computer Wins!!");
+    }
+
+  </script>
+
+</body>
+
+</html>
