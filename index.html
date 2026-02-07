@@ -7,78 +7,208 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="author" content="Eik Ulfsson">
   <title>Bear Hunter Ninja Game</title>
+  <style>
+    body {
+      background: #292929;
+      color: lightgray;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    table {
+      border: 1px solid white;
+      border-collapse: collapse;
+      width: 300px;
+    }
+
+    td {
+      border: 1px solid white;
+      padding: 5px;
+    }
+
+    td.header {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    td.data {
+      text-align: center;
+    }
+
+  </style>
 </head>
 
 <body>
-  <p id="player-choice"></p>
-  <p id="computer-choice"></p>
-  <p id="win-condition"></p>
+  <p>Stats:</p>
+  <table id="game-results"></table>
+  <p id="game-stats"></p>
+
+  <p>Press F5 or click Refresh to reload the page and play again!</p>
   <script>
+    const possibleChoices = ["bear", "hunter", "ninja"]
+    let gameResults = []; // A little extra to display the game results after the player quits the game.
+    let gameRound = 0;
+    let playerWantsToPlay = true;
 
     // Get the player's name and greet them.
     let playerName = prompt("Welcome to Bear Hunter Ninja! Please enter your name to get started.");
+    if (playerName === null || playerName === "") playerName = "Player";
     alert(`Hi ${playerName} Let's Play!!`);
 
-    // Set the player and computer choices, and ensure they're both lower case.
-    let playerChoice = prompt("Who are you: Bear, Ninja, or Hunter?").toLowerCase();
-    let computerChoice = "bear"; // Hard-coded for now.
-
-    // Initialize the winner to be a tie, modified by the if conditional below.
-    let theWinner = "tie";
-
-    // If player and computer choices are NOT equal, we look at the computer's choice compared to
-    // the player's and set the correct winner.
-    if (playerChoice !== computerChoice) {
-      // Default winner to the computer. The player entering anything invalid causes it to win automatically.
-      theWinner = "computer";
-      
-      // Go through the cases of the player's choice and sets the player as the winner based on this.
-      switch (playerChoice.toLowerCase()) {
-        case 'bear':
-          if (computerChoice === 'ninja') {
-            theWinner = "player";
-          }
-          break;
-
-        case 'hunter':
-          if (computerChoice === 'bear') {
-            theWinner = "player";
-          }
-          break;
-
-        case 'ninja':
-          if (computerChoice === 'hunter') {
-            theWinner = "player";
-          }
-          break;
+    // Main loop to keep playing upon request to quit.
+    // Any answer to the last question other than "yes" or "y" will fall through and the game will end.
+    while (playerWantsToPlay) {
+      // Build out the choice list string. Good in case we want to change or expand the choices later.
+      let choiceList = "";
+      for (let choice = 0; choice < possibleChoices.length; choice++) {
+        if (choice != possibleChoices.length - 1) {
+          choiceList += possibleChoices[choice].charAt(0).toUpperCase() + possibleChoices[choice].slice(1) + ", ";
+        } else {
+          choiceList += "or " + possibleChoices[choice].charAt(0).toUpperCase() + possibleChoices[choice].slice(1);
+        }
       }
+      
+      // Gets and sets the player and computer choices
+      // let playerChoice = prompt("Who are you: Bear, Ninja, or Hunter?");
+      let playerChoice = prompt(`Who are you: ${choiceList}?`)
+      let computerChoice = possibleChoices[Math.floor(Math.random() * possibleChoices.length)];
+
+      // Sets player input to lower case and handles possible null input (if Cancel is clicked on the prompt).
+      // If the input is null/blank we assume the player doesn't want to play so we break out and terminate.
+      if (playerChoice === null || playerChoice === "") {
+        break;
+      } else {
+        playerChoice = playerChoice.toLowerCase();
+      }
+
+      // Continually loops back if the player doesn't input anything that exists inside the array.
+      while (true) {
+        if (playerChoice === null) {
+          break;
+        } else {
+          playerChoice = playerChoice.toLowerCase();
+        }
+
+        if (!possibleChoices.includes(playerChoice)) {
+          playerChoice = prompt(`You entered an invalid input.\nPlease choose ${choiceList}:`);
+        } else {
+          break;
+        }
+      }
+
+      // A way to handle player clicking cancel. All this with the above is pretty ugly.
+      // Will be refined and handled differently in future assignments.
+      if (playerChoice === null) {
+        break;
+      }
+
+      gameRound++;
+  
+      // Initialize the winner to be a tie, modified by the if conditional below.
+      let theWinner = "tie";
+
+      // If player and computer choices are NOT equal, we look at the computer's choice compared to
+      // the player's and set the correct winner.
+      if (playerChoice !== computerChoice) {
+        // Default winner to the computer for now.
+        theWinner = "computer";
+        
+        // Go through the cases of the player's choice and sets the player as the winner based on this.
+        switch (playerChoice.toLowerCase()) {
+          case 'bear':
+            if (computerChoice === 'ninja') {
+              theWinner = "player";
+            }
+            break;
+  
+          case 'hunter':
+            if (computerChoice === 'bear') {
+              theWinner = "player";
+            }
+            break;
+  
+          case 'ninja':
+            if (computerChoice === 'hunter') {
+              theWinner = "player";
+            }
+            break;
+        }
+      }
+  
+      // Capitalize the first letter of the player's and computer's choices for the string template.
+      playerChoice = playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1);
+      computerChoice = computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1);
+  
+      // Construct the string templates.
+      let playerChoiceOutput = `${playerName}, You picked ${playerChoice}!`;
+      let computerChoiceOutput = `The computer picked ${computerChoice}!`;
+  
+      // Start building the output message for the alert and the console.
+      let gameResultsMessage = `${playerChoiceOutput}\n${computerChoiceOutput}\n`;
+
+      // Check theWinner string and output the appropriate win strings to the HTML and console.
+      if (theWinner === "tie") {
+        // document.getElementById("win-condition").innerHTML = "It's a tie!!";
+        gameResultsMessage += "It's a tie!!"
+        console.log("It's a tie!!");
+      } else if (theWinner === "player") {
+        // document.getElementById("win-condition").innerHTML = "You Win!!";
+        gameResultsMessage += "You Win!!"
+        console.log("You Win!!");
+      } else {
+        // document.getElementById("win-condition").innerHTML = "Computer Wins!!";
+        gameResultsMessage += "Computer Wins!!"
+        console.log("Computer Wins!!");
+      }
+
+      console.log(gameResultsMessage);
+      alert(gameResultsMessage);
+
+      // Add to the game statistics.
+      gameResults.push(
+        {
+          "round": gameRound,
+          "player": playerChoice,
+          "computer": computerChoice,
+          "winner": theWinner,
+        }
+      )
+        
+      // This should perhaps be a confirm dialog instead.
+      let tryAgain = prompt("Would you like to play again? (Yes/No)")
+
+      // Break the loop if the player does not want to play anymore. Anything other than
+      // "yes" or "y" or clicking Cancel will terminate the game.
+      if (tryAgain == null) {
+        playerWantsToPlay = false;
+      } else if ((tryAgain.toLowerCase() !== "yes") && (tryAgain.toLowerCase() !== "y")) {
+        playerWantsToPlay = false;
+      } 
+
+    } // End while loop.
+
+    // Build the game stats table.
+    let playerWinStats = 0;
+    let gameStatsTable = `<tr>
+        <td class="header">Round</td>
+        <td class="header">${playerName}</td>
+        <td class="header">Computer</td>
+        <td class="header">Winner</td>
+      </tr>`;
+
+    for (const result in gameResults) {
+      gameStatsTable += `<tr>
+        <td class="data">${gameResults[result].round}</td>
+        <td class="data">${gameResults[result].player}</td>
+        <td class="data">${gameResults[result].computer}</td>
+        <td class="data">${gameResults[result].winner}</td>
+      `;
+
+      if (gameResults[result].winner === "player") playerWinStats++;
     }
 
-    // Capitalize the first letter of the player's and computer's choices for the string template.
-    playerChoice = playerChoice.charAt(0).toUpperCase() + playerChoice.slice(1);
-    computerChoice = computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1);
-
-    // Construct the string templates.
-    let playerChoiceOutput = `${playerName}, You picked ${playerChoice}!`;
-    let computerChoiceOutput = `The computer picked ${computerChoice}!`;
-
-    // Set the text on the HTML page and output to the console.
-    document.getElementById("player-choice").innerHTML = playerChoiceOutput;
-    document.getElementById("computer-choice").innerHTML = computerChoiceOutput;
-    console.log(playerChoiceOutput);
-    console.log(computerChoiceOutput);
-
-    // Check theWinner string and output the appropriate win strings to the HTML and console.
-    if (theWinner === "tie") {
-      document.getElementById("win-condition").innerHTML = "It's a tie!!";
-      console.log("It's a tie!!");
-    } else if (theWinner === "player") {
-      document.getElementById("win-condition").innerHTML = "You Win!!";
-      console.log("You Win!!");
-    } else {
-      document.getElementById("win-condition").innerHTML = "Computer Wins!!";
-      console.log("Computer Wins!!");
-    }
+    // Output the stats table.
+    document.getElementById("game-results").innerHTML = gameStatsTable;
+    document.getElementById("game-stats").innerHTML = `You won ${playerWinStats} out of ${gameResults.length} game(s).`;
 
   </script>
 
